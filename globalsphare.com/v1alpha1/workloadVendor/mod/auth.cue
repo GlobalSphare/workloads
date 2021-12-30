@@ -10,14 +10,14 @@ parameter: {
 	serviceEntry?: [...{
 		name:     string
 		host:     string
-		address:  string
+		address?:  string
 		port:     int
 		protocol: string
 	}]
 }
 if parameter.serviceEntry != _|_ {
 	for k, v in parameter.serviceEntry {
-		construct: "serviceEntry-\(context.workloadName)-to-\(v.name)": {
+		"serviceEntry-\(context.workloadName)-to-\(v.name)": {
 			apiVersion: "networking.istio.io/v1alpha3"
 			kind:       "ServiceEntry"
 			metadata: {
@@ -46,7 +46,7 @@ if parameter.serviceEntry != _|_ {
 }
 if parameter.authorization != _|_ {
 	for k, v in parameter.authorization {
-		construct: "island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
+		"island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
 			apiVersion: "security.istio.io/v1beta1"
 			kind:       "AuthorizationPolicy"
 			metadata: {

@@ -1,6 +1,6 @@
 parameter: {
 }
-construct: "\(context.appName)-configmap": {
+"\(context.appName)-configmap": {
 	apiVersion: "v1"
 	kind:       "ConfigMap"
 	metadata: {
@@ -44,7 +44,7 @@ construct: "\(context.appName)-configmap": {
 	}
 }
 
-construct: "\(context.workloadName)-service-master": {
+"\(context.workloadName)-service-master": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -69,7 +69,7 @@ construct: "\(context.workloadName)-service-master": {
 	}
 }
 
-construct: "\(context.workloadName)-service-master-headless": {
+"\(context.workloadName)-service-master-headless": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -95,7 +95,7 @@ construct: "\(context.workloadName)-service-master-headless": {
 	}
 }
 
-construct: "\(context.workloadName)-service": {
+"\(context.workloadName)-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -120,7 +120,7 @@ construct: "\(context.workloadName)-service": {
 	}
 }
 
-construct: "\(context.workloadName)-statefulset-master": {
+"\(context.workloadName)-statefulset-master": {
 	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
 	metadata: {
@@ -169,7 +169,7 @@ construct: "\(context.workloadName)-statefulset-master": {
 	}
 }
 
-construct: "\(context.workloadName)-slave-service": {
+"\(context.workloadName)-slave-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -194,7 +194,7 @@ construct: "\(context.workloadName)-slave-service": {
 	}
 }
 
-construct: "\(context.workloadName)-slave-service-headless": {
+"\(context.workloadName)-slave-service-headless": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -220,7 +220,7 @@ construct: "\(context.workloadName)-slave-service-headless": {
 	}
 }
 
-construct: "\(context.workloadName)-slave-statefulset": {
+"\(context.workloadName)-slave-statefulset": {
 	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
 	metadata: {
@@ -288,7 +288,7 @@ parameter: {
 	serviceEntry?: [...{
 		name:     string
 		host:     string
-		address:  string
+		address?: string
 		port:     int
 		protocol: string
 	}]
@@ -300,7 +300,7 @@ parameter: {
 	}
 }
 
-construct: namespace: {
+namespace: {
 	apiVersion: "v1"
 	kind:       "Namespace"
 	metadata: {
@@ -310,7 +310,7 @@ construct: namespace: {
 		}
 	}
 }
-construct: serviceAccount: {
+serviceAccount: {
 	apiVersion: "v1"
 	kind:       "ServiceAccount"
 	metadata: {
@@ -318,7 +318,7 @@ construct: serviceAccount: {
 		namespace: context.namespace
 	}
 }
-construct: "default-authorizationPolicy": {
+"default-authorizationPolicy": {
 	apiVersion: "security.istio.io/v1beta1"
 	kind:       "AuthorizationPolicy"
 	metadata: {
@@ -329,7 +329,7 @@ construct: "default-authorizationPolicy": {
 }
 if parameter.serviceEntry != _|_ {
 	for k, v in parameter.serviceEntry {
-		"construct": "serviceEntry-\(context.workloadName)-to-\(v.name)": {
+		"serviceEntry-\(context.workloadName)-to-\(v.name)": {
 			apiVersion: "networking.istio.io/v1alpha3"
 			kind:       "ServiceEntry"
 			metadata: {
@@ -360,7 +360,7 @@ if parameter.serviceEntry != _|_ {
 }
 if parameter.authorization != _|_ {
 	for k, v in parameter.authorization {
-		"construct": "island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
+		"island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
 			apiVersion: "security.istio.io/v1beta1"
 			kind:       "AuthorizationPolicy"
 			metadata: {
@@ -393,5 +393,33 @@ if parameter.authorization != _|_ {
 				]
 			}
 		}
+	}
+}
+"\(context.workloadName)-viewer": {
+	apiVersion: "security.istio.io/v1beta1"
+	kind:       "AuthorizationPolicy"
+	"metadata": {
+		name:      "\(context.workloadName)-viewer"
+		namespace: context.namespace
+	}
+	spec: {
+		selector: {
+			matchLabels: {
+				app:      context.appName
+				workload: context.workloadName
+			}
+		}
+		rules: [{
+			from: [{
+				source: {
+					namespaces: [context.namespace]
+				}
+			}]
+			to: [{
+				operation: {
+					methods: ["GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS", "PATCH"]
+				}
+			}]
+		}]
 	}
 }

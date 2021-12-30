@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 type def struct {
 	Source string
@@ -64,5 +65,6 @@ func main() {
 		title := fmt.Sprintf("# %s/%s/%s\n",v.Ver,v.Source, v.Name )
 		sql += title + fmt.Sprintf("insert into %s(`name`, `ver`,`value`)values(\"%s\", \"%s\", %s);\n",tableName, v.Name, v.Ver, string(s))
 	}
+	sql = strings.ReplaceAll(sql, "\\u003e", ">")
 	ioutil.WriteFile("workloads.sql", []byte(sql),0644)
 }

@@ -12,7 +12,6 @@ parameter: {
 }
 if parameter["configs"] != _|_ {
 	for k, v in parameter.configs {
-		construct: {
 			"island-\(context.workloadName)-\(k)": {
 				apiVersion: "v1"
 				kind:       "ConfigMap"
@@ -28,6 +27,5 @@ if parameter["configs"] != _|_ {
 					}
 				}
 			}
-		}
 	}
 }

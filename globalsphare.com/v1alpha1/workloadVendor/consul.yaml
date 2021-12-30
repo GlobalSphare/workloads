@@ -9,7 +9,7 @@ spec: |
   		capacity: string | *"1G"
   	}
   }
-  construct: "\(context.workloadName)-deployment": {
+  "\(context.workloadName)-deployment": {
   	apiVersion: "apps/v1"
   	kind:       "Deployment"
   	metadata: {
@@ -55,7 +55,7 @@ spec: |
   	}
   }
 
-  construct: service: {
+  service: {
   	apiVersion: "v1"
   	kind:       "Service"
   	metadata: {
@@ -108,30 +108,6 @@ spec: |
   		}]
   	}
   }
-
-  construct: "\(context.workloadName)-viewer": {
-  	apiVersion: "security.istio.io/v1beta1"
-  	kind:       "AuthorizationPolicy"
-  	metadata: {
-  		name:      "\(context.workloadName)-viewer"
-  		namespace: context.namespace
-  	}
-  	spec: {
-  		selector: {
-  			matchLabels: {
-  				app:      context.appName
-  				workload: context.workloadName
-  			}
-  		}
-  		rules: [{
-  			to: [{
-  				operation: {
-  					methods: ["GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS", "PATCH"]
-  				}
-  			}]
-  		}]
-  	}
-  }
   context: {
   	appName:      string
   	workloadName: string
@@ -149,7 +125,7 @@ spec: |
   	serviceEntry?: [...{
   		name:     string
   		host:     string
-  		address:  string
+  		address?: string
   		port:     int
   		protocol: string
   	}]
@@ -161,7 +137,7 @@ spec: |
   	}
   }
 
-  construct: namespace: {
+  namespace: {
   	apiVersion: "v1"
   	kind:       "Namespace"
   	metadata: {
@@ -171,7 +147,7 @@ spec: |
   		}
   	}
   }
-  construct: serviceAccount: {
+  serviceAccount: {
   	apiVersion: "v1"
   	kind:       "ServiceAccount"
   	metadata: {
@@ -179,7 +155,7 @@ spec: |
   		namespace: context.namespace
   	}
   }
-  construct: "default-authorizationPolicy": {
+  "default-authorizationPolicy": {
   	apiVersion: "security.istio.io/v1beta1"
   	kind:       "AuthorizationPolicy"
   	metadata: {
@@ -190,7 +166,7 @@ spec: |
   }
   if parameter.serviceEntry != _|_ {
   	for k, v in parameter.serviceEntry {
-  		"construct": "serviceEntry-\(context.workloadName)-to-\(v.name)": {
+  		"serviceEntry-\(context.workloadName)-to-\(v.name)": {
   			apiVersion: "networking.istio.io/v1alpha3"
   			kind:       "ServiceEntry"
   			metadata: {
@@ -221,7 +197,7 @@ spec: |
   }
   if parameter.authorization != _|_ {
   	for k, v in parameter.authorization {
-  		"construct": "island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
+  		"island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
   			apiVersion: "security.istio.io/v1beta1"
   			kind:       "AuthorizationPolicy"
   			metadata: {

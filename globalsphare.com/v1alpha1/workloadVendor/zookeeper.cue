@@ -3,7 +3,7 @@ import "list"
 parameter: {
 	size: *"1G" | string
 }
-construct: "\(context.workloadName)-service": {
+"\(context.workloadName)-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -25,7 +25,7 @@ construct: "\(context.workloadName)-service": {
 		}]
 	}
 }
-construct: "\(context.workloadName)-headless-service": {
+"\(context.workloadName)-headless-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -55,7 +55,7 @@ construct: "\(context.workloadName)-headless-service": {
 	}
 }
 
-construct: "\(context.workloadName)-StatefulSet": {
+"\(context.workloadName)-StatefulSet": {
 	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
 	metadata: {
@@ -139,7 +139,7 @@ parameter: {
 	serviceEntry?: [...{
 		name:     string
 		host:     string
-		address:  string
+		address?: string
 		port:     int
 		protocol: string
 	}]
@@ -151,7 +151,7 @@ parameter: {
 	}
 }
 
-construct: namespace: {
+namespace: {
 	apiVersion: "v1"
 	kind:       "Namespace"
 	metadata: {
@@ -161,7 +161,7 @@ construct: namespace: {
 		}
 	}
 }
-construct: serviceAccount: {
+serviceAccount: {
 	apiVersion: "v1"
 	kind:       "ServiceAccount"
 	metadata: {
@@ -169,7 +169,7 @@ construct: serviceAccount: {
 		namespace: context.namespace
 	}
 }
-construct: "default-authorizationPolicy": {
+"default-authorizationPolicy": {
 	apiVersion: "security.istio.io/v1beta1"
 	kind:       "AuthorizationPolicy"
 	metadata: {
@@ -180,7 +180,7 @@ construct: "default-authorizationPolicy": {
 }
 if parameter.serviceEntry != _|_ {
 	for k, v in parameter.serviceEntry {
-		"construct": "serviceEntry-\(context.workloadName)-to-\(v.name)": {
+		"serviceEntry-\(context.workloadName)-to-\(v.name)": {
 			apiVersion: "networking.istio.io/v1alpha3"
 			kind:       "ServiceEntry"
 			metadata: {
@@ -211,7 +211,7 @@ if parameter.serviceEntry != _|_ {
 }
 if parameter.authorization != _|_ {
 	for k, v in parameter.authorization {
-		construct: "island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
+		"island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
 			apiVersion: "security.istio.io/v1beta1"
 			kind:       "AuthorizationPolicy"
 			metadata: {

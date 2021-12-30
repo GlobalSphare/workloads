@@ -5,7 +5,7 @@ parameter: {
 	}
 	init: string
 }
-construct: "\(context.workloadName)-master-configmap": {
+"\(context.workloadName)-master-configmap": {
 	apiVersion: "v1"
 	kind:       "ConfigMap"
 	metadata: {
@@ -32,7 +32,7 @@ construct: "\(context.workloadName)-master-configmap": {
 	}
 }
 
-construct: "\(context.workloadName)-master-service-headless": {
+"\(context.workloadName)-master-service-headless": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -58,7 +58,7 @@ construct: "\(context.workloadName)-master-service-headless": {
 	}
 }
 
-construct: "\(context.workloadName)-master-service": {
+"\(context.workloadName)-master-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -83,7 +83,7 @@ construct: "\(context.workloadName)-master-service": {
 	}
 }
 
-construct: "\(context.workloadName)-service": {
+"\(context.workloadName)-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -108,7 +108,7 @@ construct: "\(context.workloadName)-service": {
 	}
 }
 
-construct: "\(context.workloadName)-master-statefulset": {
+"\(context.workloadName)-master-statefulset": {
 	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
 	metadata: {
@@ -180,7 +180,7 @@ construct: "\(context.workloadName)-master-statefulset": {
 		}]
 	}
 }
-construct: "\(context.workloadName)-slave-configmap": {
+"\(context.workloadName)-slave-configmap": {
 	apiVersion: "v1"
 	kind:       "ConfigMap"
 	metadata: {
@@ -207,7 +207,7 @@ construct: "\(context.workloadName)-slave-configmap": {
 	}
 }
 
-construct: "\(context.workloadName)-slave-service": {
+"\(context.workloadName)-slave-service": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -232,7 +232,7 @@ construct: "\(context.workloadName)-slave-service": {
 	}
 }
 
-construct: "\(context.workloadName)-slave-service-headless": {
+"\(context.workloadName)-slave-service-headless": {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -258,7 +258,7 @@ construct: "\(context.workloadName)-slave-service-headless": {
 	}
 }
 
-construct: "\(context.workloadName)-slave-statefulset": {
+"\(context.workloadName)-slave-statefulset": {
 	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
 	metadata: {
@@ -351,7 +351,7 @@ parameter: {
 	serviceEntry?: [...{
 		name:     string
 		host:     string
-		address:  string
+		address?: string
 		port:     int
 		protocol: string
 	}]
@@ -363,7 +363,7 @@ parameter: {
 	}
 }
 
-construct: namespace: {
+namespace: {
 	apiVersion: "v1"
 	kind:       "Namespace"
 	metadata: {
@@ -373,7 +373,7 @@ construct: namespace: {
 		}
 	}
 }
-construct: serviceAccount: {
+serviceAccount: {
 	apiVersion: "v1"
 	kind:       "ServiceAccount"
 	metadata: {
@@ -381,7 +381,7 @@ construct: serviceAccount: {
 		namespace: context.namespace
 	}
 }
-construct: "default-authorizationPolicy": {
+"default-authorizationPolicy": {
 	apiVersion: "security.istio.io/v1beta1"
 	kind:       "AuthorizationPolicy"
 	metadata: {
@@ -392,7 +392,7 @@ construct: "default-authorizationPolicy": {
 }
 if parameter.serviceEntry != _|_ {
 	for k, v in parameter.serviceEntry {
-		"construct": "serviceEntry-\(context.workloadName)-to-\(v.name)": {
+		"serviceEntry-\(context.workloadName)-to-\(v.name)": {
 			apiVersion: "networking.istio.io/v1alpha3"
 			kind:       "ServiceEntry"
 			metadata: {
@@ -423,7 +423,7 @@ if parameter.serviceEntry != _|_ {
 }
 if parameter.authorization != _|_ {
 	for k, v in parameter.authorization {
-		construct: "island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
+		"island-allow-\(context.namespace)-to-\(v.namespace)-\(v.service)": {
 			apiVersion: "security.istio.io/v1beta1"
 			kind:       "AuthorizationPolicy"
 			metadata: {
